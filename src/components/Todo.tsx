@@ -1,19 +1,57 @@
-import { Container, Row, Col, Card, Button, Form } from "react-bootstrap";
+import { useState } from "react";
+import {
+  Container,
+  Row,
+  Col,
+  Card,
+  Button,
+  Form,
+  Modal,
+} from "react-bootstrap";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { db } from "../services/firebase.config";
 import EditTodo from "./EditTodo";
 
 const Todo = () => {
+  const collectionRef = collection(db, "todo");
+  const [createTodo, setCreateTodo] = useState("");
+  const [showAddModal, setShowAddModal] = useState(false);
+
+  // ATodo Handler
+  const submitTodo = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    try {
+      await addDoc(collectionRef, {
+        todo: createTodo,
+        isChecked: false,
+        timestamp: serverTimestamp(),
+      });
+      window.location.reload();
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const handleAddModalClose = () => {
+    setShowAddModal(false);
+  };
+
+  const handleAddModalShow = () => {
+    setShowAddModal(true);
+  };
+
   return (
     <>
       <Container>
         <Row>
-          <Col md-12>
+          <Col>
             <Card>
               <Card.Body>
                 <Button
-                  data-bs-toggle="modal"
-                  data-bs-target="#addModal"
-                  type="button"
-                  className="btn btn-info"
+                  onClick={handleAddModalShow}
+                  variant="info"
+                  className="mb-3"
                 >
                   Add Todo
                 </Button>
@@ -31,12 +69,12 @@ const Todo = () => {
                       <br />
                       <i>10/11/2022</i>
                     </span>
-                    <span className=" float-end mx-3">
+                    <span className="float-end mx-3">
                       <EditTodo />
                     </span>
-                    <button type="button" className="btn btn-danger float-end">
+                    <Button variant="danger" className="float-end">
                       Delete
-                    </button>
+                    </Button>
                   </div>
                 </div>
               </Card.Body>
@@ -45,46 +83,30 @@ const Todo = () => {
         </Row>
       </Container>
 
-      {/* Modal */}
-      <div
-        className="modal fade"
-        id="addModal"
-        aria-labelledby="addModalLabel"
-        aria-hidden="true"
-      >
-        <div className="modal-dialog">
-          <Form className="d-flex">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title" id="addModalLabel">
-                  Add Todo
-                </h5>
-                <Button
-                  type="button"
-                  className="btn-close"
-                  data-bs-dismiss="modal"
-                  aria-label="Close"
-                ></Button>
-              </div>
-              <div className="modal-body">
-                <input
-                  type="text"
-                  className="form-control"
-                  placeholder="Add a Todo"
-                />
-              </div>
-              <div className="modal-footer">
-                <Button className="btn btn-secondary" data-bs-dismiss="modal">
-                  Close
-                </Button>
-
-                <Button className="btn btn-primary">Create Todo</Button>
-              </div>
-            </div>
-          </Form>
-        </div>
-      </div>
+      <Modal show={showAddModal} onHide={handleAddModalClose}>
+        <Form onSubmit={submitTodo}>
+          <Modal.Header closeButton>
+            <Modal.Title>Add Todo</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <Form.Control
+              type="text"
+              placeholder="Add a Todo"
+              onChange={(e) => setCreateTodo(e.target.value)}
+            />
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={handleAddModalClose}>
+              Close
+            </Button>
+            <Button type="submit" variant="primary">
+              Create Todo
+            </Button>
+          </Modal.Footer>
+        </Form>
+      </Modal>
     </>
   );
 };
+
 export default Todo;
