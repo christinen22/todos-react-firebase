@@ -8,63 +8,37 @@ import {
   Form,
   Modal,
 } from "react-bootstrap";
-import {
-  collection,
-  addDoc,
-  serverTimestamp,
-  getDocs,
-  documentId,
-} from "firebase/firestore";
+import { collection, getDocs } from "firebase/firestore";
 import { db } from "../services/firebase.config";
 import EditTodo from "./EditTodo";
 import { TodoItem } from "../types";
+import AddTodo from "./AddTodo";
 
 const Todo = () => {
   const collectionRef = collection(db, "todo");
-  const [createTodo, setCreateTodo] = useState("");
-  const [showAddModal, setShowAddModal] = useState(false);
   const [todos, setTodo] = useState<TodoItem[]>([]);
 
-  // ATodo Handler
-  const submitTodo = async (e: React.FormEvent) => {
-    e.preventDefault();
-
+  const getTodo = async () => {
     try {
-      await addDoc(collectionRef, {
-        todo: createTodo,
-        isChecked: false,
-        timestamp: serverTimestamp(),
+      const todos = await getDocs(collectionRef);
+      const todoData: TodoItem[] = todos.docs.map((doc) => {
+        const { isChecked, timestamp, todo } = doc.data();
+        return { isChecked, timestamp, todo };
       });
-      window.location.reload();
+      setTodo(todoData);
+      console.log(todoData);
     } catch (err) {
       console.log(err);
     }
   };
 
-  const handleAddModalClose = () => {
-    setShowAddModal(false);
-  };
-
-  const handleAddModalShow = () => {
-    setShowAddModal(true);
-  };
-
   useEffect(() => {
-    const getTodo = async () => {
-      try {
-        const todos = await getDocs(collectionRef);
-        const todoData: TodoItem[] = todos.docs.map((doc) => {
-          const { isChecked, timestamp, todo } = doc.data();
-          return { isChecked, timestamp, todo };
-        });
-        setTodo(todoData);
-        console.log(todoData);
-      } catch (err) {
-        console.log(err);
-      }
-    };
     getTodo();
   }, []);
+
+  const handleTodoAdded = () => {
+    getTodo();
+  };
 
   return (
     <>
@@ -73,16 +47,10 @@ const Todo = () => {
           <Col>
             <Card>
               <Card.Body>
-                <Button
-                  onClick={handleAddModalShow}
-                  variant="info"
-                  className="mb-3"
-                >
-                  Add Todo
-                </Button>
+                <AddTodo onTodoAdded={handleTodoAdded} />
 
-                {todos.map((todo) => (
-                  <div className="todo-list">
+                {todos.map((todo, index) => (
+                  <div className="todo-list" key={index}>
                     <div className="todo-item">
                       <hr />
                       <span>
@@ -109,29 +77,6 @@ const Todo = () => {
           </Col>
         </Row>
       </Container>
-
-      <Modal show={showAddModal} onHide={handleAddModalClose}>
-        <Form onSubmit={submitTodo}>
-          <Modal.Header closeButton>
-            <Modal.Title>Add Todo</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <Form.Control
-              type="text"
-              placeholder="Add a Todo"
-              onChange={(e) => setCreateTodo(e.target.value)}
-            />
-          </Modal.Body>
-          <Modal.Footer>
-            <Button variant="secondary" onClick={handleAddModalClose}>
-              Close
-            </Button>
-            <Button type="submit" variant="primary">
-              Create Todo
-            </Button>
-          </Modal.Footer>
-        </Form>
-      </Modal>
     </>
   );
 };
