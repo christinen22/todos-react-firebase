@@ -1,0 +1,39 @@
+@import url('https://fonts.googleapis.com/css2?family=Amatic+SC&family=Julius+Sans+One&family=Open+Sans:wght@300&family=Rubik+Vinyl&family=Shadows+Into+Light&display=swap');
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap'); 
+
+@import "bootstrap/scss/bootstrap";
+
+body{
+    margin-top:20px;
+    background: #f8f8f8;
+  }
+  
+  .todo-list {
+     margin: 10px 0
+  }
+  
+  .todo-list .todo-item {
+    padding: 15px;
+    margin: 5px 0;
+    border-radius: 0;
+  }
+  
+  div.checker {
+    width: 18px;
+    height: 18px
+  }
+  
+  div.checker input{
+    width: 18px;
+    height: 18px
+  }
+  
+  div.checker {
+    display: inline-block;
+    vertical-align: middle;
+  }
+  
+  .done {
+    text-decoration: line-through;
+  }
