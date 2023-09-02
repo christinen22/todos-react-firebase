@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Container,
   Row,
@@ -8,14 +8,22 @@ import {
   Form,
   Modal,
 } from "react-bootstrap";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import {
+  collection,
+  addDoc,
+  serverTimestamp,
+  getDocs,
+  documentId,
+} from "firebase/firestore";
 import { db } from "../services/firebase.config";
 import EditTodo from "./EditTodo";
+import { TodoItem } from "../types";
 
 const Todo = () => {
   const collectionRef = collection(db, "todo");
   const [createTodo, setCreateTodo] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
+  const [todos, setTodo] = useState<TodoItem[]>([]);
 
   // ATodo Handler
   const submitTodo = async (e: React.FormEvent) => {
@@ -41,6 +49,23 @@ const Todo = () => {
     setShowAddModal(true);
   };
 
+  useEffect(() => {
+    const getTodo = async () => {
+      try {
+        const todos = await getDocs(collectionRef);
+        const todoData: TodoItem[] = todos.docs.map((doc) => {
+          const { isChecked, timestamp, todo } = doc.data();
+          return { isChecked, timestamp, todo };
+        });
+        setTodo(todoData);
+        console.log(todoData);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    getTodo();
+  }, []);
+
   return (
     <>
       <Container>
@@ -56,27 +81,29 @@ const Todo = () => {
                   Add Todo
                 </Button>
 
-                <div className="todo-list">
-                  <div className="todo-item">
-                    <hr />
-                    <span>
-                      <div className="checker">
-                        <span className="">
-                          <input type="checkbox" />
-                        </span>
-                      </div>
-                      &nbsp; Go hard or Go Home
-                      <br />
-                      <i>10/11/2022</i>
-                    </span>
-                    <span className="float-end mx-3">
-                      <EditTodo />
-                    </span>
-                    <Button variant="danger" className="float-end">
-                      Delete
-                    </Button>
+                {todos.map((todo) => (
+                  <div className="todo-list">
+                    <div className="todo-item">
+                      <hr />
+                      <span>
+                        <div className="checker">
+                          <span className="">
+                            <input type="checkbox" />
+                          </span>
+                        </div>
+                        &nbsp;{todo.todo}
+                        <br />
+                        <i>10/11/2022</i>
+                      </span>
+                      <span className="float-end mx-3">
+                        <EditTodo />
+                      </span>
+                      <Button variant="danger" className="float-end">
+                        Delete
+                      </Button>
+                    </div>
                   </div>
-                </div>
+                ))}
               </Card.Body>
             </Card>
           </Col>
