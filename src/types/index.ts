@@ -1,6 +1,8 @@
+import { Timestamp } from "firebase/firestore";
+
 export type TodoItem = {
     id: string,
     isChecked: boolean;
-    timestamp: { seconds: number; nanoseconds: number }; // Firebase timestamp format
+    timestamp: Timestamp
     todo: string;
 };

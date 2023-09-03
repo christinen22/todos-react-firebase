@@ -37,3 +37,8 @@ body{
   .crossed-out {
     text-decoration: line-through;
   }
+  
+  .btns {
+    display: flex;
+    justify-content: flex-end;
+  }

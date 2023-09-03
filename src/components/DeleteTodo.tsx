@@ -12,11 +12,7 @@ const DeleteTodo: React.FC<DeleteTodoProps> = ({ todoId, onDelete }) => {
 
   return (
     <div>
-      <Button
-        variant="danger"
-        className="float-end"
-        onClick={handleDeleteClick}
-      >
+      <Button variant="danger" onClick={handleDeleteClick}>
         Delete
       </Button>
     </div>

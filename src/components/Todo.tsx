@@ -6,6 +6,7 @@ import {
   deleteDoc,
   doc,
   updateDoc,
+  Timestamp,
 } from "firebase/firestore";
 import { db } from "../services/firebase.config";
 import EditTodo from "./EditTodo";
@@ -55,18 +56,12 @@ const Todo = () => {
     }
   };
 
-  // Define the updateTodo function
   const updateTodo = async (todoId: string, updatedTodo: string) => {
     try {
-      // Construct a reference to the todo document
       const todoRef = doc(db, "todo", todoId);
-
-      // Update the todo document with the new data
       await updateDoc(todoRef, {
         todo: updatedTodo,
       });
-
-      // Refresh the todo list
       getTodo();
     } catch (err) {
       console.error("Error updating todo:", err);
@@ -75,14 +70,22 @@ const Todo = () => {
 
   const handleCheckboxChange = async (todoId: string, isChecked: boolean) => {
     try {
-      // Implement your checkbox change logic here
-      // For example, you can update the isChecked field in Firestore
       const documentRef = doc(db, "todo", todoId);
       await updateDoc(documentRef, { isChecked });
-      getTodo(); // Refresh the todos list
+      getTodo();
     } catch (err) {
       console.log(err);
     }
+  };
+
+  const formatTimestamp = (timestamp: Timestamp): string => {
+    const date = timestamp.toDate(); // Convert Firestore Timestamp to TS Date
+    const options: Intl.DateTimeFormatOptions = {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    };
+    return new Intl.DateTimeFormat("en-US", options).format(date);
   };
 
   return (
@@ -112,12 +115,13 @@ const Todo = () => {
                         </div>
                         &nbsp;{todo.todo}
                         <hr />
-                        <i>10/11/2022</i>
+                        <i>{formatTimestamp(todo.timestamp)}</i>
+                        <hr />
                       </span>
-                      <span className="float-end mx-3">
+                      <div className="btns">
                         <EditTodo todoId={todo.id} onEdit={updateTodo} />
-                      </span>
-                      <DeleteTodo todoId={todo.id} onDelete={handleDelete} />
+                        <DeleteTodo todoId={todo.id} onDelete={handleDelete} />
+                      </div>
                     </div>
                   </div>
                 ))}
