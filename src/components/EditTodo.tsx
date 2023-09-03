@@ -1,8 +1,14 @@
 import { useState } from "react";
 import { Button, Modal, Form } from "react-bootstrap";
 
-const EditTodo = () => {
+interface EditTodoProps {
+  todoId: string;
+  onEdit: (todoId: string, updatedTodo: string) => void;
+}
+
+const EditTodo: React.FC<EditTodoProps> = ({ todoId, onEdit }) => {
   const [showModal, setShowModal] = useState(false);
+  const [updatedTodo, setUpdatedTodo] = useState("");
 
   const handleClose = () => {
     setShowModal(false);
@@ -10,6 +16,11 @@ const EditTodo = () => {
 
   const handleShow = () => {
     setShowModal(true);
+  };
+
+  const updateTodo = () => {
+    onEdit(todoId, updatedTodo);
+    handleClose();
   };
 
   return (
@@ -24,14 +35,19 @@ const EditTodo = () => {
         </Modal.Header>
         <Modal.Body>
           <Form>
-            <Form.Control type="text" placeholder="Todo Details" />
+            <Form.Control
+              type="text"
+              placeholder="Todo Details"
+              value={updatedTodo}
+              onChange={(e) => setUpdatedTodo(e.target.value)}
+            />
           </Form>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleClose}>
             Close
           </Button>
-          <Button variant="primary" onClick={handleClose}>
+          <Button variant="primary" onClick={updateTodo}>
             Update Todo
           </Button>
         </Modal.Footer>

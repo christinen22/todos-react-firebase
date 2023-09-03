@@ -1,6 +1,12 @@
 import { useState, useEffect } from "react";
 import { Container, Row, Col, Card } from "react-bootstrap";
-import { collection, getDocs, deleteDoc, doc } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  deleteDoc,
+  doc,
+  updateDoc,
+} from "firebase/firestore";
 import { db } from "../services/firebase.config";
 import EditTodo from "./EditTodo";
 import { TodoItem } from "../types";
@@ -48,6 +54,24 @@ const Todo = () => {
     }
   };
 
+  // Define the updateTodo function
+  const updateTodo = async (todoId: string, updatedTodo: string) => {
+    try {
+      // Construct a reference to the todo document
+      const todoRef = doc(db, "todo", todoId);
+
+      // Update the todo document with the new data
+      await updateDoc(todoRef, {
+        todo: updatedTodo,
+      });
+
+      // Refresh the todo list
+      getTodo();
+    } catch (err) {
+      console.error("Error updating todo:", err);
+    }
+  };
+
   return (
     <>
       <Container>
@@ -71,7 +95,7 @@ const Todo = () => {
                         <i>10/11/2022</i>
                       </span>
                       <span className="float-end mx-3">
-                        <EditTodo />
+                        <EditTodo todoId={todo.id} onEdit={updateTodo} />
                       </span>
                       <DeleteTodo todoId={todo.id} onDelete={handleDelete} />
                     </div>
