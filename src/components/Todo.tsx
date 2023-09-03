@@ -12,6 +12,7 @@ import EditTodo from "./EditTodo";
 import { TodoItem } from "../types";
 import AddTodo from "./AddTodo";
 import DeleteTodo from "./DeleteTodo";
+import CheckboxHandler from "./CheckboxHandler";
 
 const Todo = () => {
   const collectionRef = collection(db, "todo");
@@ -72,6 +73,18 @@ const Todo = () => {
     }
   };
 
+  const handleCheckboxChange = async (todoId: string, isChecked: boolean) => {
+    try {
+      // Implement your checkbox change logic here
+      // For example, you can update the isChecked field in Firestore
+      const documentRef = doc(db, "todo", todoId);
+      await updateDoc(documentRef, { isChecked });
+      getTodo(); // Refresh the todos list
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   return (
     <>
       <Container>
@@ -82,13 +95,20 @@ const Todo = () => {
                 <AddTodo onTodoAdded={handleTodoAdded} />
                 {todos.map((todo, index) => (
                   <div className="todo-list" key={index}>
-                    <div className="todo-item">
+                    <div
+                      className={`todo-item ${
+                        todo.isChecked ? "crossed-out" : ""
+                      }`}
+                    >
                       <hr />
                       <span>
                         <div className="checker">
-                          <span className="">
-                            <input type="checkbox" />
-                          </span>
+                          <CheckboxHandler
+                            isChecked={todo.isChecked}
+                            onChange={(isChecked) =>
+                              handleCheckboxChange(todo.id, isChecked)
+                            }
+                          />
                         </div>
                         &nbsp;{todo.todo}
                         <hr />
