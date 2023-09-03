@@ -1,4 +1,5 @@
 import { Button } from "react-bootstrap";
+import { GiTrashCan } from "react-icons/gi";
 
 interface DeleteTodoProps {
   todoId: string;
@@ -13,7 +14,7 @@ const DeleteTodo: React.FC<DeleteTodoProps> = ({ todoId, onDelete }) => {
   return (
     <div>
       <Button variant="danger" onClick={handleDeleteClick}>
-        Delete
+        <GiTrashCan />
       </Button>
     </div>
   );

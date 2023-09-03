@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Button, Modal, Form } from "react-bootstrap";
+import { BsPencil } from "react-icons/bs";
 
 interface EditTodoProps {
   todoId: string;
@@ -26,7 +27,7 @@ const EditTodo: React.FC<EditTodoProps> = ({ todoId, onEdit }) => {
   return (
     <>
       <Button variant="primary" onClick={handleShow}>
-        Edit Todo
+        <BsPencil />
       </Button>
 
       <Modal show={showModal} onHide={handleClose}>
